@@ -23,7 +23,7 @@ export default async function setup(): Promise<void> {
   try {
     await admin.connect();
   } catch (error) {
-    throw new Error(`API tests need PostgreSQL at ${url.host}. Start it with: docker compose up -d postgres\n(${(error as Error).message})`);
+    throw new Error(`API tests need PostgreSQL at ${url.host}. Start it with: docker compose up -d postgres\n(${(error as Error).message})`, { cause: error });
   }
   const exists = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
   if (exists.rowCount === 0) await admin.query(`CREATE DATABASE "${dbName.replace(/"/g, '')}"`);
@@ -38,21 +38,21 @@ export default async function setup(): Promise<void> {
     await mongo.connect();
     await mongo.db(TEST_MONGODB_DB_NAME).command({ ping: 1 });
   } catch (error) {
-    throw new Error(`API tests need MongoDB at ${TEST_MONGODB_URL}. Start it with: docker compose up -d mongo\n(${(error as Error).message})`);
+    throw new Error(`API tests need MongoDB at ${TEST_MONGODB_URL}. Start it with: docker compose up -d mongo\n(${(error as Error).message})`, { cause: error });
   } finally {
     await mongo.close();
   }
   try {
     await fetch(`${TEST_MEILI_URL}/health`);
   } catch (error) {
-    throw new Error(`API tests need Meilisearch at ${TEST_MEILI_URL}. Start it with: docker compose up -d meilisearch\n(${(error as Error).message})`);
+    throw new Error(`API tests need Meilisearch at ${TEST_MEILI_URL}. Start it with: docker compose up -d meilisearch\n(${(error as Error).message})`, { cause: error });
   }
   const redis = new Redis(TEST_REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
   try {
     await redis.connect();
     await redis.ping();
   } catch (error) {
-    throw new Error(`API tests need Redis at ${TEST_REDIS_URL}. Start it with: docker compose up -d redis\n(${(error as Error).message})`);
+    throw new Error(`API tests need Redis at ${TEST_REDIS_URL}. Start it with: docker compose up -d redis\n(${(error as Error).message})`, { cause: error });
   } finally {
     await redis.quit().catch(() => undefined);
   }
@@ -60,7 +60,7 @@ export default async function setup(): Promise<void> {
     const conn = await connect(TEST_RABBITMQ_URL);
     await conn.close();
   } catch (error) {
-    throw new Error(`API tests need RabbitMQ at ${TEST_RABBITMQ_URL}. Start it with: docker compose up -d rabbitmq\n(${(error as Error).message})`);
+    throw new Error(`API tests need RabbitMQ at ${TEST_RABBITMQ_URL}. Start it with: docker compose up -d rabbitmq\n(${(error as Error).message})`, { cause: error });
   }
 
   // Same seed script docker-compose's catalog-seed one-shot runs, against the isolated test store/index.

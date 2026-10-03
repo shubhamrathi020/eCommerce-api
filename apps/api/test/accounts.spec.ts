@@ -40,8 +40,8 @@ describe('accounts and addresses API', () => {
     const bad = await me.post('/account/addresses', address({ phone: '123', address: { line1: ' ', city: 'B', state: 'K', pincode: '0000' } }));
     expect(bad.body.fields).toEqual({ phone: 'Enter a valid 10-digit mobile number', line1: 'Address is required', pincode: 'Enter a valid 6-digit pin code' });
 
-    let list = (await me.post('/account/addresses', address())).body;
-    list = (await me.post('/account/addresses', address({ label: 'Office' }))).body;
+    await me.post('/account/addresses', address());
+    let list = (await me.post('/account/addresses', address({ label: 'Office' }))).body;
     expect(list.map((a: { label: string; isDefault: boolean }) => [a.label, a.isDefault])).toEqual([['Home', true], ['Office', false]]);
 
     list = (await me.post(`/account/addresses/${list[1].id}/default`)).body;
