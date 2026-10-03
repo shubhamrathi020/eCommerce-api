@@ -1,7 +1,3 @@
-# NOTE: this pipeline installs dependencies from the registry/git only. While package.json still says
-# "@ecom/contracts": "link:../eCommerce-contracts" (a sibling folder on your machine), CI cannot install it.
-# Publish the eCommerce-contracts repository, then run `pnpm add -w github:<account>/eCommerce-contracts#v0.1.0`
-# (see README.md, "Working with the contracts package") and delete the `contracts` stage from apps/api/Dockerfile.
 name: CI
 
 on:

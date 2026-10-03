@@ -86,8 +86,6 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-      additional_contexts:
-        contracts_src: ../eCommerce-contracts
       target: migrate
     image: shop-api-migrate:local
     entrypoint: ["node", "--import", "tsx", "apps/api/scripts/seed-catalog.ts"]
@@ -106,8 +104,6 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-      additional_contexts:
-        contracts_src: ../eCommerce-contracts
       target: migrate
     image: shop-api-migrate:local
     environment:
@@ -121,8 +117,6 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-      additional_contexts:
-        contracts_src: ../eCommerce-contracts
       target: runtime
     image: shop-api:local
     ports:

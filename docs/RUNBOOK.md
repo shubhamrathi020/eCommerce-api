@@ -4,18 +4,10 @@ Everyday commands for running, testing and deploying the backend API and its inf
 
 ## 1. First time
 
-This repository is the **backend** (NestJS API, database schema, Docker, Kubernetes, monitoring). It depends on the sibling repository `eCommerce-contracts` (shared types and rules), which must be checked out next to this one and built once:
-
-```
-claude/
-  eCommerce/             <- the frontend
-  eCommerce-contracts/   <- shared contract package
-  eCommerce-api/         <- this repository
-```
+This repository is the **backend** (NestJS API, database schema, Docker, Kubernetes, monitoring). The shared contract package `@ecom/contracts` is downloaded from its tagged GitHub release on install (see README.md); the frontend is the separate `eCommerce` repository.
 
 ```bash
-cd ../eCommerce-contracts && pnpm install && pnpm build   # first time, and after any change there
-cd ../eCommerce-api && pnpm install && pnpm db:generate
+pnpm install && pnpm db:generate
 ```
 
 Needs Node 22 and pnpm (`corepack enable` picks the pinned version) and Docker Desktop for the data stores. Copy `apps/api/.env.example` to `apps/api/.env` (dev-only values).
@@ -70,7 +62,6 @@ pnpm docker:up      # builds the API images and starts everything
 pnpm docker:down    # stops and removes them
 ```
 
-The API image needs the shared contract package: `docker compose` passes `../eCommerce-contracts` as a named build context (`contracts_src`). For a plain `docker build` add `--build-context contracts_src=../eCommerce-contracts`.
 
 | Service | URL | Container user | Health |
 |---|---|---|---|
