@@ -1,0 +1,280 @@
+# The API (BRD 25, K8-01). `api-stable`/`api-canary` are two Deployments sharing one Service selector
+# (`app: api`) — Kubernetes Services load-balance round-robin across every pod matching the selector
+# regardless of which Deployment owns it, so the replica-count ratio between the two *is* the traffic
+# split (a real, working canary release without needing a service mesh — see docs/CANARY-RELEASE.md for
+# how to run one, watch it, and abort it). `api-canary` starts at 0 replicas: no canary traffic until
+# someone deliberately starts one.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-stable
+  labels:
+    app: api
+    track: stable
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: api
+      track: stable
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: api
+        track: stable
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: api
+      containers:
+        - name: api
+          image: shop-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3333
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secret
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://ecommerce:$(POSTGRES_PASSWORD)@postgres.shop-data.svc.cluster.local:5432/ecommerce?schema=public"
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 750m, memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-canary
+  labels:
+    app: api
+    track: canary
+spec:
+  replicas: 0 # scaled up deliberately to start a canary release — see docs/CANARY-RELEASE.md
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: api
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: api
+        track: canary
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: shop-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3333
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secret
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://ecommerce:$(POSTGRES_PASSWORD)@postgres.shop-data.svc.cluster.local:5432/ecommerce?schema=public"
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 750m, memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  selector:
+    app: api # matches pods from EITHER Deployment — that's what makes the replica ratio a traffic split
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+# One-shot: applies migrations and seeds demo accounts, same image target as docker-compose's api-migrate.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: api-migrate
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: shop-api-migrate
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: api-secret
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://ecommerce:$(POSTGRES_PASSWORD)@postgres.shop-data.svc.cluster.local:5432/ecommerce?schema=public"
+            # This Job's own CMD (unlike the runtime image's `node main.js`) invokes `pnpm` through
+            # corepack, which needs somewhere writable for its cache — found live: with
+            # `readOnlyRootFilesystem: true` and no override, corepack's default `~/.cache/node/corepack`
+            # isn't writable and the container fails before ever reaching the actual migration
+            # (`ENOENT: no such file or directory, mkdir '/home/node/.cache/node/corepack/v1'`).
+            - name: COREPACK_HOME
+              value: /tmp/corepack
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# One-shot: loads the 252 seeded products into Mongo and builds the Meilisearch index, same image/script
+# as docker-compose's catalog-seed service. Idempotent — safe to re-run any time.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: catalog-seed
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: catalog-seed
+          image: shop-api-migrate
+          imagePullPolicy: IfNotPresent
+          command: ["node", "--import", "tsx", "apps/api/scripts/seed-catalog.ts"]
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://mongo:27017"
+            - name: MEILI_URL
+              value: "http://meilisearch:7700"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

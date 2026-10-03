@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: shop
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - storefront.yaml
+  - admin.yaml
+  - redis.yaml
+  - mongo.yaml
+  - meilisearch.yaml
+  - rabbitmq.yaml
+  - api.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - pdb.yaml
+  - network-policy.yaml
+secretGenerator:
+  - name: postgres-secret
+    envs:
+      - secrets/postgres.env
+  - name: api-secret
+    envs:
+      - secrets/api.env
+images:
+  - name: shop-storefront
+    newTag: local
+  - name: shop-admin
+    newTag: local
+  - name: shop-api
+    newTag: local
+  - name: shop-api-migrate
+    newTag: local

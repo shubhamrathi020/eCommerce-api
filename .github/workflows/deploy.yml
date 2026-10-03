@@ -1,0 +1,74 @@
+# Continuous delivery (BRD 25, K8-04): deploy a release to staging, and only if it is healthy, promote to
+# production.
+#
+# STATUS: WRITTEN BUT NEVER RUN. It needs a real cluster, a container registry and cloud credentials that
+# do not exist in this environment (see deploy/terraform/aws, also unexercised). The gating logic — roll out,
+# wait for `rollout status`, smoke-test, roll back on failure, and make production depend on staging — is
+# what this file exists to specify; expect to adjust registry/auth steps when it is first pointed at real
+# infrastructure. Triggered by hand (workflow_dispatch) on purpose: nothing should deploy on every push
+# until the first manual run has proven it works.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to deploy (e.g. a git SHA already pushed to the registry)"
+        required: true
+
+permissions:
+  contents: read
+  id-token: write # for OIDC to the cloud provider instead of long-lived keys
+
+env:
+  REGISTRY: ${{ vars.REGISTRY }} # e.g. <account>.dkr.ecr.ap-south-1.amazonaws.com
+
+jobs:
+  staging:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl for staging
+        run: echo "Fill in: aws eks update-kubeconfig --name ecommerce-staging (via OIDC role ${{ vars.STAGING_ROLE_ARN }})"
+      - name: Roll out
+        run: |
+          cd deploy/k8s/overlays/staging 2>/dev/null || cd deploy/k8s/base
+          kubectl kustomize . | sed "s#shop-api:local#${REGISTRY}/shop-api:${{ inputs.image_tag }}#" | kubectl apply -f -
+      - name: Wait for the rollout — a failed health check stops the pipeline here
+        run: kubectl -n shop rollout status deployment/api-stable --timeout=300s
+      - name: Smoke test
+        run: |
+          curl -fsS "${{ vars.STAGING_URL }}/readyz"
+          curl -fsS "${{ vars.STAGING_URL }}/catalog/home" > /dev/null
+      - name: Roll back if anything above failed
+        if: failure()
+        run: kubectl -n shop rollout undo deployment/api-stable
+
+  production:
+    name: Promote to production
+    runs-on: ubuntu-latest
+    needs: staging # production never runs unless staging fully succeeded
+    environment: production # configure required reviewers on this environment for a manual approval gate
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl for production
+        run: echo "Fill in: aws eks update-kubeconfig --name ecommerce-production (via OIDC role ${{ vars.PRODUCTION_ROLE_ARN }})"
+      - name: Start a canary first (1 pod alongside the stable ones — see docs/CANARY-RELEASE.md)
+        run: |
+          kubectl -n shop set image deployment/api-canary api=${REGISTRY}/shop-api:${{ inputs.image_tag }}
+          kubectl -n shop scale deployment/api-canary --replicas=1
+          kubectl -n shop rollout status deployment/api-canary --timeout=300s
+      - name: Watch the canary's error rate; abort automatically if it is bad
+        run: bash deploy/scripts/canary-check.sh
+      - name: Promote — roll the stable deployment to the new image
+        run: |
+          kubectl -n shop set image deployment/api-stable api=${REGISTRY}/shop-api:${{ inputs.image_tag }}
+          kubectl -n shop rollout status deployment/api-stable --timeout=300s
+      - name: Retire the canary
+        if: always()
+        run: kubectl -n shop scale deployment/api-canary --replicas=0
+      - name: Roll back production if promotion failed
+        if: failure()
+        run: kubectl -n shop rollout undo deployment/api-stable

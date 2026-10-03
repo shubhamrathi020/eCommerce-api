@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storefront-config
+data:
+  PORT: "4000"
+  # Hosts the SSR server accepts (Host header allow-list). Add the real domain per environment.
+  ALLOWED_HOSTS: "shop.localtest.me,localhost,storefront,storefront.shop.svc.cluster.local"
+---
+# Non-secret API config (BRD 25, K8-01/K8-02) — connection strings to the cluster-internal Services
+# (each backing service's own manifest), never a secret itself since none of it is credential material
+# beyond a hostname/port; the actual passwords/JWT secrets are in api-secret/postgres-secret instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+data:
+  PORT: "3333"
+  NODE_ENV: "production"
+  MONGODB_URL: "mongodb://mongo:27017"
+  MEILI_URL: "http://meilisearch:7700"
+  REDIS_URL: "redis://redis:6379"
+  RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+  CORS_ORIGINS: "http://shop.localtest.me,http://admin.localtest.me"
+  # DATABASE_URL is built in api.yaml's own container env instead of here: it needs to interpolate
+  # POSTGRES_PASSWORD from a Secret, and ConfigMap values are static strings with no variable expansion —
+  # only a container's own `env:` list supports `$(OTHER_VAR)` substitution.

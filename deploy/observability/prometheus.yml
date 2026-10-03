@@ -1,0 +1,24 @@
+# Prometheus config for local development (BRD 24, OB-01). `host.docker.internal` is Docker Desktop's
+# name for the machine running Docker (Windows/Mac) — this is how a container reaches the API when it's
+# running on your host with `pnpm start:api` (the normal way to run this stack locally, see RUNBOOK.md
+# §4a). If you instead run the whole stack with `pnpm docker:up`, change the target to `api:3333` (the
+# compose service name) since the API is then a container on the same docker-compose network too.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - alert-rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  - job_name: api
+    static_configs:
+      - targets: ['host.docker.internal:3333']
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']

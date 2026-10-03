@@ -1,0 +1,92 @@
+{
+  "title": "eCommerce API overview",
+  "uid": "ecom-api-overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "browser",
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request rate by status class",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(http_requests_total[1m])) by (status)", "legendFormat": "{{status}}" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Error rate (5xx / total, 5m)",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "thresholds": { "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 0.02 }, { "color": "red", "value": 0.05 } ] } } },
+      "targets": [
+        { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "p95 request duration",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Catalog cache hit ratio (BRD 22)",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "steps": [ { "color": "red", "value": null }, { "color": "orange", "value": 0.5 }, { "color": "green", "value": 0.8 } ] } } },
+      "targets": [{ "expr": "cache_hit_ratio" }]
+    },
+    {
+      "id": 5,
+      "title": "Circuit breaker state (BRD 24, OB-05): 0=closed 1=half-open 2=open",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 9, "x": 6, "y": 8 },
+      "fieldConfig": { "defaults": { "min": 0, "max": 2 } },
+      "targets": [{ "expr": "circuit_breaker_state", "legendFormat": "{{dependency}}" }]
+    },
+    {
+      "id": 6,
+      "title": "Outbox backlog (BRD 23)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 9, "x": 15, "y": 8 },
+      "targets": [{ "expr": "outbox_unpublished_total" }]
+    },
+    {
+      "id": 7,
+      "title": "Process memory (RSS)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "targets": [{ "expr": "process_resident_memory_bytes" }]
+    },
+    {
+      "id": 8,
+      "title": "Event loop lag (p50/p95/p99)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        { "expr": "nodejs_eventloop_lag_p50_seconds", "legendFormat": "p50" },
+        { "expr": "nodejs_eventloop_lag_p95_seconds", "legendFormat": "p95" },
+        { "expr": "nodejs_eventloop_lag_p99_seconds", "legendFormat": "p99" }
+      ]
+    }
+  ]
+}

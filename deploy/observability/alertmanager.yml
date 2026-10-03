@@ -1,0 +1,18 @@
+# Alertmanager config for local development (BRD 24, OB-04). No real Slack/email account exists in this
+# environment (the same situation BRD 21 was in with Razorpay, and BRD 23 with an email provider), so
+# alerts route to a "null" webhook receiver that just logs them — real, working alert routing and
+# grouping, with a real stand-in destination. Point `webhook_configs.url` at your own Slack incoming
+# webhook, PagerDuty, or an SMTP relay's webhook bridge to make alerts reach a real channel; nothing else
+# here needs to change.
+route:
+  receiver: default
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+
+receivers:
+  - name: default
+    webhook_configs:
+      - url: 'http://alert-log:9105/alerts'
+        send_resolved: true

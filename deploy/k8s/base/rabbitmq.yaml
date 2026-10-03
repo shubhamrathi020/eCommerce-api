@@ -1,0 +1,102 @@
+# Message broker (BRD 23). A PVC so the outbox-relay's published messages and any dead letters survive
+# a pod restart (losing them would mean losing not-yet-delivered notification emails).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:4-management-alpine
+          ports:
+            - name: amqp
+              containerPort: 5672
+            - name: management
+              containerPort: 15672
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 1, memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          # RabbitMQ takes 15-20s to boot even without contention, longer on a loaded node — the earlier
+          # readiness/liveness-only version had the liveness probe's own first check land before boot
+          # finished, restarting a perfectly healthy (just still-booting) container in a loop. A
+          # startupProbe with real headroom (up to 2 minutes) suppresses liveness until one check
+          # actually succeeds, exactly like storefront.yaml/api.yaml already do for the same reason.
+          # `rabbitmq-diagnostics` itself boots a whole separate Erlang node just to RPC into the running
+          # one — it routinely takes several real seconds to return even when the broker underneath is
+          # already fully up (confirmed live: the pod's own logs showed "Server startup complete" while
+          # every probe was still failing with "command timed out ... after 1s", the exec probe's default
+          # timeout). `timeoutSeconds` has to be raised on all three, not just the failure threshold.
+          startupProbe:
+            exec: { command: ["rabbitmq-diagnostics", "-q", "ping"] }
+            periodSeconds: 5
+            timeoutSeconds: 8
+            failureThreshold: 24
+          readinessProbe:
+            exec: { command: ["rabbitmq-diagnostics", "-q", "ping"] }
+            periodSeconds: 5
+            timeoutSeconds: 8
+            failureThreshold: 5
+          livenessProbe:
+            exec: { command: ["rabbitmq-diagnostics", "-q", "ping"] }
+            periodSeconds: 15
+            timeoutSeconds: 8
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rabbitmq-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: management
+      port: 15672
+      targetPort: management

@@ -1,0 +1,33 @@
+# Keeps at least one pod running during voluntary disruptions such as node drains.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: storefront
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: storefront
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: admin
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: admin
+---
+# Scoped to the stable track only (`track: stable`, not just `app: api`) — a canary release is meant to
+# be disposable; it should never block a voluntary disruption (node drain, etc.) from proceeding.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-stable
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api
+      track: stable

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+  labels:
+    # Enforce the "restricted" Pod Security Standard: non-root, no privilege escalation, dropped capabilities.
+    pod-security.kubernetes.io/enforce: restricted

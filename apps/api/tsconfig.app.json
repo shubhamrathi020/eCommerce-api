@@ -1,0 +1,39 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
+    "types": ["node"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // Inline TypeScript's helpers instead of requiring `tslib`, which is only a dev dependency of the workspace
+    // and so is absent from the production image.
+    "importHelpers": false,
+    // Was "es2021", overriding the workspace base's es2022 — found to matter for a real reason, not just
+    // pinned lower out of caution: at es2021, whatever in this build's toolchain downlevels class-field
+    // syntax (Prisma 7's own runtime bundle uses it, e.g. `class extends Error { name = "..."; }`) was
+    // moving the field's assignment into the constructor *before* `super()` runs — invalid per spec, and
+    // a real "ReferenceError: Must call super constructor..." crash on every Prisma-touching request,
+    // caught only by actually running the built production image on Kubernetes, never by `nx serve`'s
+    // dev build. Node 22 (this service's only runtime, per apps/api/Dockerfile) natively supports class
+    // fields, so targeting es2022 (matching the workspace base) avoids the downlevel transform entirely
+    // rather than trying to find and fix whichever specific tool was reordering it.
+    "target": "es2022",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "vite.config.ts",
+    "vite.config.mts",
+    "vitest.config.ts",
+    "vitest.config.mts",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.tsx",
+    "src/**/*.test.js",
+    "src/**/*.spec.js",
+    "src/**/*.test.jsx",
+    "src/**/*.spec.jsx"
+  ]
+}

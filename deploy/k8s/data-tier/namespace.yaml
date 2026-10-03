@@ -1,0 +1,16 @@
+# A second, separate namespace for postgres alone (BRD 25, K8-01/K8-02). Not "restricted" like `shop`:
+# the official postgres image's own entrypoint needs to `chown`/`chmod` a fresh PVC's data directory to
+# 0700 once, which structurally requires root (POSIX: only a file's *owner* can chmod it, and Kubernetes'
+# `fsGroup` only ever changes *group* ownership, never the owning user) — found by actually applying it
+# under `restricted` and reading the real admission-controller rejection (`kubectl describe deployment
+# postgres` showed `FailedCreate ... violates PodSecurity "restricted:latest"`), not by assuming it up
+# front. `baseline` still blocks privileged containers, host namespaces/ports and most capabilities; it
+# only additionally allows the one thing this specific upstream image needs (running as root transiently).
+# mongo/redis/rabbitmq/meilisearch did NOT need this — their images tolerate a non-root, restricted pod
+# just fine — so only postgres was moved, keeping the exception as narrow as it can be.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop-data
+  labels:
+    pod-security.kubernetes.io/enforce: baseline

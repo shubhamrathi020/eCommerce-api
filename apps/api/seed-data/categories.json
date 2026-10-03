@@ -1,0 +1,2149 @@
+[
+ {
+  "id": "cat-fashion",
+  "slug": "fashion",
+  "name": "Fashion",
+  "order": 1
+ },
+ {
+  "id": "cat-men-clothing",
+  "slug": "men-clothing",
+  "name": "Men Clothing",
+  "parentId": "cat-fashion",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "S",
+     "M",
+     "L",
+     "XL"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Cotton",
+     "Linen",
+     "Denim",
+     "Polyester"
+    ]
+   },
+   {
+    "key": "fit",
+    "label": "Fit",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Regular",
+     "Slim",
+     "Relaxed"
+    ]
+   },
+   {
+    "key": "pattern",
+    "label": "Pattern",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Solid",
+     "Striped",
+     "Checked"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-women-clothing",
+  "slug": "women-clothing",
+  "name": "Women Clothing",
+  "parentId": "cat-fashion",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "S",
+     "M",
+     "L",
+     "XL"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Cotton",
+     "Silk",
+     "Georgette",
+     "Rayon"
+    ]
+   },
+   {
+    "key": "fit",
+    "label": "Fit",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Regular",
+     "A-Line",
+     "Relaxed"
+    ]
+   },
+   {
+    "key": "pattern",
+    "label": "Pattern",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Solid",
+     "Printed",
+     "Floral"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-kids-wear",
+  "slug": "kids-wear",
+  "name": "Kids Wear",
+  "parentId": "cat-fashion",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Age",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "2-3Y",
+     "4-5Y",
+     "6-7Y",
+     "8-9Y"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Cotton",
+     "Fleece",
+     "Polyester"
+    ]
+   },
+   {
+    "key": "gender",
+    "label": "For",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Boys",
+     "Girls",
+     "Unisex"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-footwear",
+  "slug": "footwear",
+  "name": "Footwear",
+  "parentId": "cat-fashion",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size (UK)",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "6",
+     "7",
+     "8",
+     "9",
+     "10"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Leather",
+     "Mesh",
+     "Canvas",
+     "Rubber"
+    ]
+   },
+   {
+    "key": "closure",
+    "label": "Closure",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Lace-up",
+     "Slip-on",
+     "Velcro"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-watches",
+  "slug": "watches",
+  "name": "Watches",
+  "parentId": "cat-fashion",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Strap colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "Navy",
+     "Grey",
+     "Brown"
+    ]
+   },
+   {
+    "key": "dial",
+    "label": "Dial shape",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Round",
+     "Square"
+    ]
+   },
+   {
+    "key": "strap",
+    "label": "Strap material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Leather",
+     "Steel",
+     "Silicone"
+    ]
+   },
+   {
+    "key": "water",
+    "label": "Water resistant",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-bags-and-luggage",
+  "slug": "bags-and-luggage",
+  "name": "Bags & Luggage",
+  "parentId": "cat-fashion",
+  "order": 6,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "capacity",
+    "label": "Capacity (L)",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "15",
+     "25",
+     "35",
+     "55",
+     "75"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Nylon",
+     "Polyester",
+     "Leather"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-electronics",
+  "slug": "electronics",
+  "name": "Electronics",
+  "order": 2
+ },
+ {
+  "id": "cat-mobiles",
+  "slug": "mobiles",
+  "name": "Mobiles",
+  "parentId": "cat-electronics",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "storage",
+    "label": "Storage",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "64 GB",
+     "128 GB",
+     "256 GB"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "Blue",
+     "Silver"
+    ]
+   },
+   {
+    "key": "ram",
+    "label": "RAM",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "4 GB",
+     "6 GB",
+     "8 GB",
+     "12 GB"
+    ]
+   },
+   {
+    "key": "display",
+    "label": "Display",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "6.1 in",
+     "6.5 in",
+     "6.7 in"
+    ]
+   },
+   {
+    "key": "battery",
+    "label": "Battery",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "4500 mAh",
+     "5000 mAh",
+     "5500 mAh"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-laptops",
+  "slug": "laptops",
+  "name": "Laptops",
+  "parentId": "cat-electronics",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "ram",
+    "label": "RAM",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "8 GB",
+     "16 GB",
+     "32 GB"
+    ]
+   },
+   {
+    "key": "storage",
+    "label": "Storage",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "256 GB SSD",
+     "512 GB SSD",
+     "1 TB SSD"
+    ]
+   },
+   {
+    "key": "processor",
+    "label": "Processor",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Core i5",
+     "Core i7",
+     "Ryzen 5",
+     "Ryzen 7"
+    ]
+   },
+   {
+    "key": "screen",
+    "label": "Screen",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "13.3 in",
+     "14 in",
+     "15.6 in"
+    ]
+   },
+   {
+    "key": "os",
+    "label": "OS",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Windows 11",
+     "Linux",
+     "macOS-like"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-televisions",
+  "slug": "televisions",
+  "name": "Televisions",
+  "parentId": "cat-electronics",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Screen size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "32 in",
+     "43 in",
+     "55 in",
+     "65 in"
+    ]
+   },
+   {
+    "key": "resolution",
+    "label": "Resolution",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "HD",
+     "Full HD",
+     "4K"
+    ]
+   },
+   {
+    "key": "panel",
+    "label": "Panel",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "LED",
+     "QLED",
+     "OLED"
+    ]
+   },
+   {
+    "key": "refresh",
+    "label": "Refresh rate",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "60 Hz",
+     "120 Hz"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-audio-and-headphones",
+  "slug": "audio-and-headphones",
+  "name": "Audio & Headphones",
+  "parentId": "cat-electronics",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Blue",
+     "Red"
+    ]
+   },
+   {
+    "key": "type",
+    "label": "Connectivity",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Bluetooth",
+     "Wired",
+     "Bluetooth + Wired"
+    ]
+   },
+   {
+    "key": "anc",
+    "label": "Noise cancellation",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   },
+   {
+    "key": "battery",
+    "label": "Playback",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "8 hrs",
+     "20 hrs",
+     "40 hrs"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-cameras",
+  "slug": "cameras",
+  "name": "Cameras",
+  "parentId": "cat-electronics",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "Silver"
+    ]
+   },
+   {
+    "key": "kit",
+    "label": "Kit",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Body only",
+     "With lens"
+    ]
+   },
+   {
+    "key": "sensor",
+    "label": "Sensor",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "APS-C",
+     "Full frame",
+     "1-inch"
+    ]
+   },
+   {
+    "key": "video",
+    "label": "Video",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "1080p",
+     "4K"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-smart-wearables",
+  "slug": "smart-wearables",
+  "name": "Smart Wearables",
+  "parentId": "cat-electronics",
+  "order": 6,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "Silver",
+     "Rose Gold"
+    ]
+   },
+   {
+    "key": "size",
+    "label": "Case size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "40 mm",
+     "44 mm"
+    ]
+   },
+   {
+    "key": "battery",
+    "label": "Battery life",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "5 days",
+     "10 days",
+     "14 days"
+    ]
+   },
+   {
+    "key": "gps",
+    "label": "GPS",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-grocery",
+  "slug": "grocery",
+  "name": "Grocery",
+  "order": 3
+ },
+ {
+  "id": "cat-fruits-and-vegetables",
+  "slug": "fruits-and-vegetables",
+  "name": "Fruits & Vegetables",
+  "parentId": "cat-grocery",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "500 g",
+     "1 kg",
+     "2 kg"
+    ]
+   },
+   {
+    "key": "organic",
+    "label": "Organic",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   },
+   {
+    "key": "origin",
+    "label": "Origin",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Local farms",
+     "Imported"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-staples-and-grains",
+  "slug": "staples-and-grains",
+  "name": "Staples & Grains",
+  "parentId": "cat-grocery",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "1 kg",
+     "5 kg",
+     "10 kg"
+    ]
+   },
+   {
+    "key": "diet",
+    "label": "Diet",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Vegetarian",
+     "Vegan"
+    ]
+   },
+   {
+    "key": "organic",
+    "label": "Organic",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-snacks",
+  "slug": "snacks",
+  "name": "Snacks",
+  "parentId": "cat-grocery",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "100 g",
+     "250 g",
+     "500 g"
+    ]
+   },
+   {
+    "key": "diet",
+    "label": "Diet",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Vegetarian",
+     "Vegan"
+    ]
+   },
+   {
+    "key": "flavour",
+    "label": "Flavour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Salted",
+     "Masala",
+     "Cheese",
+     "Chocolate"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-beverages",
+  "slug": "beverages",
+  "name": "Beverages",
+  "parentId": "cat-grocery",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "250 ml",
+     "1 L",
+     "2 L"
+    ]
+   },
+   {
+    "key": "type",
+    "label": "Type",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Hot",
+     "Cold"
+    ]
+   },
+   {
+    "key": "sugar",
+    "label": "Sugar",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Regular",
+     "Sugar free"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-dairy-and-eggs",
+  "slug": "dairy-and-eggs",
+  "name": "Dairy & Eggs",
+  "parentId": "cat-grocery",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "200 g",
+     "500 g",
+     "1 kg"
+    ]
+   },
+   {
+    "key": "diet",
+    "label": "Diet",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Vegetarian",
+     "Non-Vegetarian"
+    ]
+   },
+   {
+    "key": "fat",
+    "label": "Fat",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Full fat",
+     "Low fat"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-packaged-foods",
+  "slug": "packaged-foods",
+  "name": "Packaged Foods",
+  "parentId": "cat-grocery",
+  "order": 6,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Pack size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "200 g",
+     "500 g",
+     "1 kg"
+    ]
+   },
+   {
+    "key": "diet",
+    "label": "Diet",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Vegetarian",
+     "Vegan",
+     "Non-Vegetarian"
+    ]
+   },
+   {
+    "key": "shelf",
+    "label": "Shelf life",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "6 months",
+     "12 months"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-home-and-kitchen",
+  "slug": "home-and-kitchen",
+  "name": "Home & Kitchen",
+  "order": 4
+ },
+ {
+  "id": "cat-furniture",
+  "slug": "furniture",
+  "name": "Furniture",
+  "parentId": "cat-home-and-kitchen",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Finish",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Walnut",
+     "Oak",
+     "White",
+     "Black"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Engineered wood",
+     "Solid wood",
+     "Metal"
+    ]
+   },
+   {
+    "key": "assembly",
+    "label": "Assembly",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "DIY",
+     "Carpenter"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-cookware",
+  "slug": "cookware",
+  "name": "Cookware",
+  "parentId": "cat-home-and-kitchen",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Small",
+     "Medium",
+     "Large"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Stainless steel",
+     "Aluminium",
+     "Cast iron"
+    ]
+   },
+   {
+    "key": "induction",
+    "label": "Induction ready",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-home-decor",
+  "slug": "home-decor",
+  "name": "Home Decor",
+  "parentId": "cat-home-and-kitchen",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "White",
+     "Gold",
+     "Black",
+     "Blue"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Wood",
+     "Metal",
+     "Ceramic",
+     "Fabric"
+    ]
+   },
+   {
+    "key": "style",
+    "label": "Style",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Modern",
+     "Classic",
+     "Rustic"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-bedding",
+  "slug": "bedding",
+  "name": "Bedding",
+  "parentId": "cat-home-and-kitchen",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Single",
+     "Double",
+     "King"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "White",
+     "Grey",
+     "Blue",
+     "Beige"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Cotton",
+     "Microfibre",
+     "Linen"
+    ]
+   },
+   {
+    "key": "thread",
+    "label": "Thread count",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "150",
+     "250",
+     "400"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-appliances",
+  "slug": "appliances",
+  "name": "Appliances",
+  "parentId": "cat-home-and-kitchen",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Silver"
+    ]
+   },
+   {
+    "key": "power",
+    "label": "Power",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "500 W",
+     "1000 W",
+     "1500 W"
+    ]
+   },
+   {
+    "key": "warranty",
+    "label": "Warranty",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "1 year",
+     "2 years"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-storage",
+  "slug": "storage",
+  "name": "Storage",
+  "parentId": "cat-home-and-kitchen",
+  "order": 6,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Small",
+     "Medium",
+     "Large"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Plastic",
+     "Fabric",
+     "Metal",
+     "Bamboo"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-beauty",
+  "slug": "beauty",
+  "name": "Beauty",
+  "order": 5
+ },
+ {
+  "id": "cat-skincare",
+  "slug": "skincare",
+  "name": "Skincare",
+  "parentId": "cat-beauty",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "50 ml",
+     "100 ml",
+     "200 ml"
+    ]
+   },
+   {
+    "key": "skin",
+    "label": "Skin type",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "All",
+     "Oily",
+     "Dry",
+     "Sensitive"
+    ]
+   },
+   {
+    "key": "vegan",
+    "label": "Vegan",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-makeup",
+  "slug": "makeup",
+  "name": "Makeup",
+  "parentId": "cat-beauty",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "shade",
+    "label": "Shade",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Nude",
+     "Rose",
+     "Berry",
+     "Coral"
+    ]
+   },
+   {
+    "key": "finish",
+    "label": "Finish",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Matte",
+     "Glossy",
+     "Satin"
+    ]
+   },
+   {
+    "key": "vegan",
+    "label": "Vegan",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-haircare",
+  "slug": "haircare",
+  "name": "Haircare",
+  "parentId": "cat-beauty",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "100 ml",
+     "250 ml",
+     "500 ml"
+    ]
+   },
+   {
+    "key": "hair",
+    "label": "Hair type",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "All",
+     "Dry",
+     "Oily",
+     "Curly"
+    ]
+   },
+   {
+    "key": "sulphate",
+    "label": "Sulphate free",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-fragrances",
+  "slug": "fragrances",
+  "name": "Fragrances",
+  "parentId": "cat-beauty",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "30 ml",
+     "50 ml",
+     "100 ml"
+    ]
+   },
+   {
+    "key": "for",
+    "label": "For",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Men",
+     "Women",
+     "Unisex"
+    ]
+   },
+   {
+    "key": "notes",
+    "label": "Fragrance family",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Woody",
+     "Floral",
+     "Citrus",
+     "Musk"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-personal-care",
+  "slug": "personal-care",
+  "name": "Personal Care",
+  "parentId": "cat-beauty",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Regular",
+     "Family pack"
+    ]
+   },
+   {
+    "key": "for",
+    "label": "For",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Men",
+     "Women",
+     "Unisex"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-sports-and-fitness",
+  "slug": "sports-and-fitness",
+  "name": "Sports & Fitness",
+  "order": 6
+ },
+ {
+  "id": "cat-gym-equipment",
+  "slug": "gym-equipment",
+  "name": "Gym Equipment",
+  "parentId": "cat-sports-and-fitness",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "weight",
+    "label": "Weight",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "2 kg",
+     "5 kg",
+     "10 kg"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Steel",
+     "Rubber",
+     "Neoprene"
+    ]
+   },
+   {
+    "key": "level",
+    "label": "Level",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Beginner",
+     "Intermediate",
+     "Pro"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-sportswear",
+  "slug": "sportswear",
+  "name": "Sportswear",
+  "parentId": "cat-sports-and-fitness",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "S",
+     "M",
+     "L",
+     "XL"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "White",
+     "Navy",
+     "Olive",
+     "Maroon",
+     "Grey"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Polyester",
+     "Dry-fit",
+     "Spandex blend"
+    ]
+   },
+   {
+    "key": "sport",
+    "label": "Sport",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Running",
+     "Gym",
+     "Training"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-outdoor",
+  "slug": "outdoor",
+  "name": "Outdoor",
+  "parentId": "cat-sports-and-fitness",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Green",
+     "Orange",
+     "Grey"
+    ]
+   },
+   {
+    "key": "season",
+    "label": "Season",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Summer",
+     "3 season",
+     "4 season"
+    ]
+   },
+   {
+    "key": "weight",
+    "label": "Weight",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Ultralight",
+     "Standard"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-cycling",
+  "slug": "cycling",
+  "name": "Cycling",
+  "parentId": "cat-sports-and-fitness",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "S",
+     "M",
+     "L"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Black",
+     "Red",
+     "Blue"
+    ]
+   },
+   {
+    "key": "type",
+    "label": "Type",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Adult",
+     "Kids"
+    ]
+   },
+   {
+    "key": "gears",
+    "label": "Gears",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Single speed",
+     "7 speed",
+     "21 speed"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-yoga",
+  "slug": "yoga",
+  "name": "Yoga",
+  "parentId": "cat-sports-and-fitness",
+  "order": 5,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Purple",
+     "Teal",
+     "Grey",
+     "Pink"
+    ]
+   },
+   {
+    "key": "thickness",
+    "label": "Thickness",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "4 mm",
+     "6 mm",
+     "8 mm"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "TPE",
+     "Cork",
+     "Natural rubber"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-books",
+  "slug": "books",
+  "name": "Books",
+  "order": 7
+ },
+ {
+  "id": "cat-fiction",
+  "slug": "fiction",
+  "name": "Fiction",
+  "parentId": "cat-books",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "format",
+    "label": "Format",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Paperback",
+     "Hardcover"
+    ]
+   },
+   {
+    "key": "language",
+    "label": "Language",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "English",
+     "Hindi"
+    ]
+   },
+   {
+    "key": "pages",
+    "label": "Pages",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "200",
+     "320",
+     "480"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-non-fiction",
+  "slug": "non-fiction",
+  "name": "Non-Fiction",
+  "parentId": "cat-books",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "format",
+    "label": "Format",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Paperback",
+     "Hardcover"
+    ]
+   },
+   {
+    "key": "language",
+    "label": "Language",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "English",
+     "Hindi"
+    ]
+   },
+   {
+    "key": "pages",
+    "label": "Pages",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "200",
+     "320",
+     "480"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-academic",
+  "slug": "academic",
+  "name": "Academic",
+  "parentId": "cat-books",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "format",
+    "label": "Format",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Paperback",
+     "Hardcover"
+    ]
+   },
+   {
+    "key": "level",
+    "label": "Level",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "School",
+     "Undergraduate",
+     "Competitive exams"
+    ]
+   },
+   {
+    "key": "edition",
+    "label": "Edition",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Latest",
+     "Revised"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-comics",
+  "slug": "comics",
+  "name": "Comics",
+  "parentId": "cat-books",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "format",
+    "label": "Format",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Paperback",
+     "Hardcover"
+    ]
+   },
+   {
+    "key": "language",
+    "label": "Language",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "English",
+     "Hindi"
+    ]
+   },
+   {
+    "key": "age",
+    "label": "Age group",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Kids",
+     "Teens",
+     "Adults"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-toys-and-games",
+  "slug": "toys-and-games",
+  "name": "Toys & Games",
+  "order": 8
+ },
+ {
+  "id": "cat-action-figures",
+  "slug": "action-figures",
+  "name": "Action Figures",
+  "parentId": "cat-toys-and-games",
+  "order": 1,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Small",
+     "Large"
+    ]
+   },
+   {
+    "key": "age",
+    "label": "Age",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "3+",
+     "6+",
+     "12+"
+    ]
+   },
+   {
+    "key": "battery",
+    "label": "Needs batteries",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Yes",
+     "No"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-board-games",
+  "slug": "board-games",
+  "name": "Board Games",
+  "parentId": "cat-toys-and-games",
+  "order": 2,
+  "attributeDefs": [
+   {
+    "key": "edition",
+    "label": "Edition",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Standard",
+     "Deluxe"
+    ]
+   },
+   {
+    "key": "players",
+    "label": "Players",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "2",
+     "2-4",
+     "2-6"
+    ]
+   },
+   {
+    "key": "age",
+    "label": "Age",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "6+",
+     "10+",
+     "14+"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-learning-toys",
+  "slug": "learning-toys",
+  "name": "Learning Toys",
+  "parentId": "cat-toys-and-games",
+  "order": 3,
+  "attributeDefs": [
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Multicolour",
+     "Pastel"
+    ]
+   },
+   {
+    "key": "age",
+    "label": "Age",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "3+",
+     "6+",
+     "9+"
+    ]
+   },
+   {
+    "key": "skill",
+    "label": "Skill",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Maths",
+     "Language",
+     "STEM",
+     "Creativity"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cat-outdoor-play",
+  "slug": "outdoor-play",
+  "name": "Outdoor Play",
+  "parentId": "cat-toys-and-games",
+  "order": 4,
+  "attributeDefs": [
+   {
+    "key": "size",
+    "label": "Size",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Small",
+     "Large"
+    ]
+   },
+   {
+    "key": "colour",
+    "label": "Colour",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": true,
+    "values": [
+     "Red",
+     "Blue",
+     "Green"
+    ]
+   },
+   {
+    "key": "age",
+    "label": "Age",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "3+",
+     "6+",
+     "12+"
+    ]
+   },
+   {
+    "key": "material",
+    "label": "Material",
+    "type": "enum",
+    "filterable": true,
+    "variantAxis": false,
+    "values": [
+     "Plastic",
+     "Metal",
+     "Wood"
+    ]
+   }
+  ]
+ }
+]

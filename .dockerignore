@@ -1,0 +1,20 @@
+node_modules
+dist
+tmp
+coverage
+.git
+.nx
+.angular
+.vscode
+.claude
+**/*.md
+!**/README.md
+Dockerfile*
+docker-compose*.yml
+deploy
+docs
+# Never bake local environment files (they can hold secrets) into an image
+**/.env
+**/.env.*
+!**/.env.example
+apps/api/generated

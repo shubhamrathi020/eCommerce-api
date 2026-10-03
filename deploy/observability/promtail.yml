@@ -1,0 +1,26 @@
+# Ships Docker container logs to Loki (BRD 24, OB-02). Reads the JSON log files Docker itself already
+# writes for every container (mounted read-only below) — no logging agent inside the app images, no
+# change to how the API logs (it already writes structured JSON with a request id, see
+# RequestContextMiddleware/ApiErrorFilter; this just gets those lines somewhere searchable across
+# containers and restarts). Only picks up containers actually run via `docker compose` (this compose
+# project's own containers, labelled by Docker itself) — a host-run `pnpm start:api` dev server's logs
+# stay in your own terminal, same limitation Prometheus's own scrape config notes for that same case.
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        target_label: container
+      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+        target_label: service

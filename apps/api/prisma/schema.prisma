@@ -1,0 +1,167 @@
+// eCommerce backend schema (BRD 19: identity, accounts, addresses).
+// Catalog, orders and the rest arrive with BRD 20/21 and may move some of this to MongoDB per the
+// architecture decision (PostgreSQL for transactional data, MongoDB for the catalog).
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  customer
+  admin
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String?
+  roles         Role[]    @default([customer])
+  /// Argon2id hash (salt and parameters are encoded inside it).
+  passwordHash  String
+  emailVerified Boolean   @default(false)
+  /// SHA-256 of the emailed token, never the token itself, so a database leak does not leak live links.
+  verifyTokenHash String? @unique
+  resetTokenHash  String? @unique
+  resetExpires  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  addresses     SavedAddress[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+/// One row per issued refresh token (hashed, never the raw token), so reuse of an already-rotated
+/// token can be detected and the whole chain revoked (BF-03).
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  /// The token this one replaced, so a whole family can be revoked on reuse detection.
+  replacedBy  String?
+  family      String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([family])
+  @@map("refresh_tokens")
+}
+
+/// Brute-force protection, one row per email address whether or not an account exists (mirrors the mock).
+model LoginAttempt {
+  email       String    @id
+  count       Int       @default(0)
+  firstAt     DateTime  @default(now())
+  lockedUntil DateTime?
+
+  @@map("login_attempts")
+}
+
+model SavedAddress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  name      String
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("saved_addresses")
+}
+
+/// One row per cart, keyed by its owner: "user:<id>" for a signed-in customer, "guest:<token>" for the
+/// cookie-identified guest cart (BRD 21, CM21-01). `items` is the same `StoredCart.items` shape the mock
+/// keeps in localStorage (priced fresh from Mongo on every read, never trusted as-is from the client).
+model Cart {
+  id             String   @id @default(cuid())
+  ownerKey       String   @unique
+  items          Json     @default("[]")
+  couponCode     String?
+  shippingMethod String   @default("standard")
+  /// Set once an abandoned-cart reminder (BRD 23, MQ-05) has gone out for the cart's current contents;
+  /// cleared on the next real content change (`CartService.mutate`), not on a plain read, so re-abandoning
+  /// after a fresh change can trigger one more reminder rather than never sending a second one at all.
+  reminderSentAt DateTime?
+  updatedAt      DateTime @updatedAt
+
+  @@map("carts")
+}
+
+/// Transactional outbox (BRD 23, MQ-02): a domain write and its event row commit together in one
+/// PostgreSQL transaction, so an event can never be "lost" (the row is right there if the broker was
+/// down) or fired without the write actually having happened. `OutboxRelay` is the only thing that reads
+/// unpublished rows and publishes them to RabbitMQ; it marks `publishedAt` only after the broker's publish
+/// confirm comes back, so a crash between publish and mark just means the same row is retried (the
+/// notification consumer's own idempotency check absorbs that at-least-once duplicate downstream).
+model OutboxEvent {
+  id          String    @id @default(cuid())
+  /// The RabbitMQ routing key, e.g. "order.placed", "payment.confirmed", "cart.abandoned".
+  routingKey  String
+  payload     Json
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+  attempts    Int       @default(0)
+  lastError   String?
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_events")
+}
+
+/// One row per order (CM21-03). `lines`/`totals`/`timeline`/`notes` are the same shapes as the shared
+/// `Order`/`OrderNote` frontend models — priced and computed once at write time, never recomputed from
+/// a client-supplied value.
+model Order {
+  id              String    @id
+  status          String
+  paymentStatus   String
+  paymentMethod   String
+  userId          String?
+  /// Set instead of `userId` for a guest order, from the same cookie the guest cart uses, so `OrderApi.list()`
+  /// can show "orders placed on this device" without a signed-in account, matching the mock.
+  guestToken      String?
+  lines           Json
+  totals          Json
+  couponCode      String?
+  shippingMethod  String
+  contactName     String
+  contactEmail    String
+  contactPhone    String
+  addressLine1    String
+  addressLine2    String?
+  addressCity     String
+  addressState    String
+  addressPincode  String
+  timeline        Json
+  notes           Json      @default("[]")
+  /// The client-generated key from `PlaceOrderRequest`; a retry with the same key returns the original order.
+  idempotencyKey  String    @unique
+  /// Set for an online-payment order still awaiting payment; past this, a lazy sweep cancels it and
+  /// releases its stock hold (CM21-04's "release on timeout", without a separate cron worker yet).
+  paymentDeadline DateTime?
+  providerOrderId   String?
+  /// Set once payment.confirm succeeds; refunds (CM21-05) are issued against this, not the order id.
+  providerPaymentId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([guestToken])
+  @@map("orders")
+}

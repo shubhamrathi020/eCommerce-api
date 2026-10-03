@@ -1,0 +1,74 @@
+# Search index (BRD 20). Rebuildable from Mongo by re-running the seed/index job, so no PVC — losing it
+# means re-indexing, not data loss.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meilisearch
+  labels:
+    app: meilisearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meilisearch
+  template:
+    metadata:
+      labels:
+        app: meilisearch
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        # The image ships no non-root user of its own and its default /meili_data is root:root 755 (no
+        # group/other write) — found by actually starting the pod and reading "Permission denied (os
+        # error 13)" in its logs, not by reading the Dockerfile in advance. fsGroup makes the emptyDir
+        # below group-owned and group-writable by 1000, which is what actually fixes it.
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: meilisearch
+          image: getmeili/meilisearch:v1.54
+          ports:
+            - name: http
+              containerPort: 7700
+          env:
+            - name: MEILI_NO_ANALYTICS
+              value: "true"
+            - name: MEILI_ENV
+              value: "development"
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 1, memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /meili_data
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meilisearch
+  labels:
+    app: meilisearch
+spec:
+  selector:
+    app: meilisearch
+  ports:
+    - name: http
+      port: 7700
+      targetPort: http

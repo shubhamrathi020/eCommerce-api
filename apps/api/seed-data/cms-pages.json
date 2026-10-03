@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "about",
+    "title": "About us",
+    "body": "<p>We are a modern online store bringing fashion, electronics, groceries and more to your door.</p><p>Our promise: fair prices, genuine products and fast delivery.</p>",
+    "seo": { "description": "Learn about our store and what we stand for." }
+  },
+  {
+    "slug": "faq",
+    "title": "Frequently asked questions",
+    "body": "<h2>How long does delivery take?</h2><p>Most orders arrive within 3 to 5 working days.</p><h2>Can I return an item?</h2><p>Eligible items can be returned within 7 days of delivery.</p><h2>Which payment methods do you accept?</h2><p>UPI, cards, net banking, wallets and cash on delivery.</p>",
+    "seo": { "description": "Answers to common questions about orders, delivery and returns." }
+  },
+  {
+    "slug": "terms",
+    "title": "Terms and conditions",
+    "body": "<p>These placeholder terms will be replaced with reviewed legal text before launch.</p>",
+    "seo": { "description": "Terms and conditions of using the store." }
+  },
+  {
+    "slug": "privacy",
+    "title": "Privacy policy",
+    "body": "<p>This placeholder privacy policy will be replaced with reviewed legal text before launch. We only collect the data needed to fulfil your orders.</p>",
+    "seo": { "description": "How we collect and protect your personal data." }
+  },
+  {
+    "slug": "contact",
+    "title": "Contact us",
+    "body": "<p>Email: support@example.com</p><p>Phone: 1800-000-0000 (Mon to Sat, 9am to 6pm)</p>",
+    "seo": { "description": "Get in touch with our support team." }
+  }
+]

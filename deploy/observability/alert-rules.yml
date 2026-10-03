@@ -1,0 +1,50 @@
+# Real Prometheus alerting rules (BRD 24, OB-04). Thresholds are deliberately simple, not tuned against
+# real production traffic (there is none yet) — treat these as a starting point to adjust once you have
+# real load, not settled SLOs.
+groups:
+  - name: api-slos
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'API error rate above 5% over the last 5 minutes'
+          description: '{{ $value | humanizePercentage }} of requests are failing with a 5xx status.'
+
+      - alert: SlowRequests
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'API p95 latency above 1 second'
+          description: 'p95 request duration has been over 1s for 5 minutes: {{ $value }}s.'
+
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state == 2
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'A circuit breaker is open: {{ $labels.dependency }}'
+          description: '{{ $labels.dependency }} has failed enough times that calls are now failing fast instead of being attempted (BRD 24, OB-05).'
+
+      - alert: OutboxBacklogGrowing
+        expr: outbox_unpublished_total > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Outbox relay is falling behind'
+          description: '{{ $value }} events are waiting to be published to RabbitMQ — check the relay and the broker (BRD 23).'
+
+      - alert: ApiDown
+        expr: up{job="api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Prometheus cannot scrape the API'
+          description: 'The api job has been unreachable for a minute.'

@@ -1,0 +1,83 @@
+# "Pods only talk to what they need" (BRD 25, K8-02) — ingress-side network policies: a default-deny
+# baseline for the namespace, then one explicit allow per real caller→callee edge. Egress is left
+# unrestricted (documented, not hidden): a default-deny-egress policy needs its own careful allow-list
+# for DNS/every real destination, and getting that wrong silently breaks the whole namespace, which is a
+# worse failure mode for a first pass than "ingress is locked down, egress isn't yet".
+#
+# Docker Desktop's Kubernetes DOES enforce these (corrected after actually testing — an earlier draft of
+# this file assumed the opposite, the common claim for kind/minikube's default CNI). Real, live proof:
+# the `catalog-seed` Job's pods have neither `app: api` nor `job-name: api-migrate`, so before the rule
+# below existed they hit a genuine 30-second MongoServerSelectionError trying to reach `mongo:27017` —
+# not a flaky timeout, a real deny, reproduced consistently across retries until this rule was added.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-controller-to-frontends
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [storefront, admin, api]
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector: {} # any namespace (ingress-nginx runs in its own) ...
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx # ... but only that specific pod
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-datastores
+spec:
+  # Every backing store accepts connections only from the api pods (either track) — never directly from
+  # the frontends, and never from each other. Postgres lives in the separate `shop-data` namespace (see
+  # deploy/k8s/data-tier's own comment for why) with the equivalent policy there instead.
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [redis, mongo, meilisearch, rabbitmq]
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+      # api-migrate and catalog-seed (one-shot Jobs) also need these at startup; neither has an `app`
+      # label of its own, so each is matched by its auto-generated `job-name` label instead.
+    - from:
+        - podSelector:
+            matchLabels:
+              job-name: api-migrate
+    - from:
+        - podSelector:
+            matchLabels:
+              job-name: catalog-seed
+---
+# Prometheus (running outside this namespace, in the default/observability compose stack in this
+# project's case) needs to reach /metrics — allowed narrowly, by port, not opened up to "any namespace".
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-metrics-scraping
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes: ["Ingress"]
+  ingress:
+    - from: [] # any source ...
+      ports:
+        - protocol: TCP
+          port: 3333 # ... but only on the API's own port, and only for what's already allowed above plus this
