@@ -38,7 +38,7 @@ See [docs/RUNBOOK.md](docs/RUNBOOK.md) for everything else (containers, monitori
 That works on this machine only. Before CI or a container build can run anywhere else, publish `eCommerce-contracts` (for example to GitHub) and switch both this repository and the frontend to a tagged git dependency:
 
 ```bash
-pnpm add github:<your-account>/eCommerce-contracts#v0.1.0
+pnpm add -w github:<your-account>/eCommerce-contracts#v0.1.0
 ```
 
 Then delete the `contracts` stage and the two `COPY --from=contracts` lines in `apps/api/Dockerfile` (they exist only to supply the sibling folder to a Docker build). Always depend on a tag, never a branch. A change to the contract is made in `eCommerce-contracts`, tagged, and then taken up here and in the frontend; a breaking change needs both sides updated before either is deployed.
