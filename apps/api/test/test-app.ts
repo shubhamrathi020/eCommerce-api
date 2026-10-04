@@ -25,11 +25,15 @@ export interface TestApp {
 }
 
 /**
- * When `GO_API_BIN` points at the compiled Go server (eCommerce-go), the very same specs run against it instead of
- * the in-process Nest app: a separate process per test file, configured through the environment, talking to the same
- * databases. Tests that reach into the Nest app's internals (`t.app.get(...)`) are skipped in that mode.
+ * When `API_BIN` (or its older name `GO_API_BIN`) points at another implementation of this API (the Go server in
+ * eCommerce-go, the Node server in eCommerce-node, the .NET server in eCommerce-dotnet), the very same specs run
+ * against it instead of the in-process Nest app: a separate process per test file, configured through the
+ * environment, talking to the same databases. `API_ARGS` holds extra arguments (for example the script path for
+ * `API_BIN=node`), split on spaces. Tests that reach into the Nest app's internals (`t.app.get(...)`) are skipped.
  */
-export const REMOTE = !!process.env['GO_API_BIN'];
+const REMOTE_BIN = process.env['API_BIN'] ?? process.env['GO_API_BIN'];
+const REMOTE_ARGS = (process.env['API_ARGS'] ?? '').split(' ').filter(Boolean);
+export const REMOTE = !!REMOTE_BIN;
 /** `it` for tests that need the in-process Nest app. */
 export const itInProcess = REMOTE ? it.skip : it;
 
@@ -60,20 +64,20 @@ async function createRemoteApp(bin: string, overrides: Partial<ApiConfig>): Prom
     CORS_ORIGINS: ORIGIN,
     ...(overrides.rateLimit ? { RATE_LIMIT: 'on' } : {}),
   };
-  const child = spawn(bin, [], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(bin, REMOTE_ARGS, { env, stdio: ['ignore', 'pipe', 'pipe'] });
   let output = '';
   child.stdout?.on('data', (d: Buffer) => (output += d.toString()));
   child.stderr?.on('data', (d: Buffer) => (output += d.toString()));
   const base = `http://127.0.0.1:${port}`;
   for (let i = 0; ; i++) {
-    if (child.exitCode !== null) throw new Error(`The Go server exited at startup:
+    if (child.exitCode !== null) throw new Error(`The remote server exited at startup:
 ${output}`);
     try {
       if ((await fetch(`${base}/healthz`)).ok) break;
     } catch {
       /* not listening yet */
     }
-    if (i > 300) throw new Error(`The Go server did not start:
+    if (i > 300) throw new Error(`The remote server did not start:
 ${output}`);
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -81,7 +85,7 @@ ${output}`);
   const db = new PrismaService(dbConfig);
   const mongo = new MongoService(dbConfig);
   await mongo.onModuleInit();
-  // The Go server keeps its dev mailbox in memory, like the Nest one; read it over HTTP (synchronously, as the specs do).
+  // The remote server keeps its dev mailbox in memory, like the Nest one; read it over HTTP (synchronously, as the specs do).
   const mail = {
     list: () => JSON.parse(execFileSync(process.execPath, ['-e', 'fetch(process.argv[1]).then((r) => r.text()).then((t) => process.stdout.write(t))', `${base}/dev/outbox`], { encoding: 'utf8' })),
   } as unknown as MailService;
@@ -119,7 +123,7 @@ ${output}`);
 
 /** The real app (same pipeline as `main.ts`) against the test database. */
 export async function createTestApp(overrides: Partial<ApiConfig> = {}): Promise<TestApp> {
-  if (process.env['GO_API_BIN']) return createRemoteApp(process.env['GO_API_BIN'], overrides);
+  if (REMOTE_BIN) return createRemoteApp(REMOTE_BIN, overrides);
   const config: ApiConfig = {
     ...loadConfig({
       NODE_ENV: 'test',
