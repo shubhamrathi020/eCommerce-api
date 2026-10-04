@@ -63,6 +63,13 @@ describe.skipIf(!process.env['PROBE_OUT'])('parity probe', () => {
     record('admin-no-token', await t.http().get('/admin/orders'));
     record('trailing-slash', await t.http().get('/healthz/'));
     record('case-insensitive', await t.http().get('/HEALTHZ'));
+    record('docs-page', await t.http().get('/docs'));
+    record('docs-page-slash', await t.http().get('/docs/'));
+    record('docs-json', Object.assign(await t.http().get('/docs/openapi.json'), { body: { paths: 'omitted' } }));
+    record('docs-init-js', await t.http().get('/docs/swagger-ui-init.js'));
+    record('docs-bundle-js', await t.http().get('/docs/swagger-ui-bundle.js'));
+    record('docs-css', await t.http().get('/docs/swagger-ui.css'));
+    record('docs-missing', await t.http().get('/docs/nope.js'));
     record('double-encoded-param', await t.http().get('/catalog/products/%E0%A4%A'));
   });
 });
