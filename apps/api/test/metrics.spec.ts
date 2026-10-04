@@ -31,7 +31,7 @@ describe('metrics and resilience endpoints (BRD 24)', () => {
     expect(body).toMatch(/circuit_breaker_state\{dependency="meilisearch"\} 0/m);
     expect(body).toMatch(/^# TYPE outbox_unpublished_total gauge$/m);
 
-    // Node's own baseline (event loop lag, memory, ...) via prom-client's collectDefaultMetrics.
+    // Node's own baseline (event loop lag, memory, ...) via the Prometheus client's collectDefaultMetrics.
     expect(body).toMatch(/^# TYPE process_resident_memory_bytes gauge$/m);
   });
 

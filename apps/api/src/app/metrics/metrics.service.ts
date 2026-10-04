@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Counter, Gauge, Histogram, Registry, collectDefaultMetrics } from 'prom-client';
+import { Counter, Gauge, Histogram, Registry, collectDefaultMetrics } from '@prometheus-io/client';
 import { CacheService } from '../cache/cache.service';
 import { RazorpayService } from '../commerce/razorpay.service';
 import { SearchService } from '../catalog/search.service';
@@ -12,7 +12,7 @@ const CIRCUIT_STATE_VALUE: Record<string, number> = { closed: 0, half_open: 1, o
  * plus the operational numbers this project already tracks internally (BRD 22's cache hit ratio, BRD 24's
  * own circuit-breaker state, BRD 23's outbox backlog) republished in a format Prometheus can scrape and
  * Grafana can chart. Gauges that read from another service (cache, breakers, the outbox table) use
- * prom-client's `collect()` hook, which runs at scrape time — nothing is pushed or duplicated, `/metrics`
+ * the Prometheus client's `collect()` hook, which runs at scrape time — nothing is pushed or duplicated, `/metrics`
  * always reflects the current numbers `/admin/system/cache-stats`/`resilience` would show right now.
  */
 @Injectable()

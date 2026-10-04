@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch: # the "Run workflow" button on the Actions tab
 
 # Least privilege: the pipeline only reads the repository.
 permissions:
@@ -88,7 +89,7 @@ jobs:
       # Image scanning (BRD 25, K8-04). Fails the job on a fixable CRITICAL finding; HIGH is reported but not
       # blocking yet, same "reported before enforced" posture as the dependency audit above.
       - name: Scan API image for vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: shop-api:ci
           severity: CRITICAL

@@ -31,7 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure kubectl for staging
-        run: echo "Fill in: aws eks update-kubeconfig --name ecommerce-staging (via OIDC role ${{ vars.STAGING_ROLE_ARN }})"
+        run: |
+          echo "Fill in: aws eks update-kubeconfig --name ecommerce-staging (via OIDC role ${{ vars.STAGING_ROLE_ARN }})"
       - name: Roll out
         run: |
           cd deploy/k8s/overlays/staging 2>/dev/null || cd deploy/k8s/base
@@ -54,7 +55,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure kubectl for production
-        run: echo "Fill in: aws eks update-kubeconfig --name ecommerce-production (via OIDC role ${{ vars.PRODUCTION_ROLE_ARN }})"
+        run: |
+          echo "Fill in: aws eks update-kubeconfig --name ecommerce-production (via OIDC role ${{ vars.PRODUCTION_ROLE_ARN }})"
       - name: Start a canary first (1 pod alongside the stable ones — see docs/CANARY-RELEASE.md)
         run: |
           kubectl -n shop set image deployment/api-canary api=${REGISTRY}/shop-api:${{ inputs.image_tag }}
