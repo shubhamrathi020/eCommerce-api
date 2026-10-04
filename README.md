@@ -12,6 +12,22 @@ This is one of three repositories, kept as sibling folders:
 
 The business requirements, project log and steering documents stay in the `eCommerce` repository (they cover both halves); read them there.
 
+## Other implementations of this API
+
+Three more servers implement the same HTTP API against the same databases, so a frontend (or a token, or a user) can move between
+them: [`eCommerce-go`](../eCommerce-go) (port 3334), [`eCommerce-node`](../eCommerce-node) (3335) and
+[`eCommerce-dotnet`](../eCommerce-dotnet) (3336). This repository still owns the PostgreSQL schema and migrations, and its integration
+specs are the definition of "the same": run them against another server with
+
+```bash
+cd apps/api
+API_BIN=<server executable> [API_ARGS="<arguments, e.g. a script path>"] pnpm exec vitest run test/
+```
+
+(`GO_API_BIN` still works.) Each spec file then starts that server as a child process on a free port instead of the in-process Nest
+app. `test/parity-probe.spec.ts` additionally records how a server answers odd requests (`PROBE_OUT=<file>`), to diff two servers.
+Change the API here first, then in the others.
+
 ## Start
 
 ```bash

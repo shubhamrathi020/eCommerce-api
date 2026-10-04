@@ -9,6 +9,7 @@ Backend half of a solo eCommerce project (NestJS, PostgreSQL/Prisma, MongoDB, Re
 ## Rules specific to this repository
 - A shape or rule that both sides use belongs in `../eCommerce-contracts`, not here. Change it there first, tag it, then update both consumers.
 - Never push; the owner pushes. Commit messages end with the attribution line given by the session.
+- `../eCommerce-go`, `../eCommerce-node` and `../eCommerce-dotnet` implement this same API and are held to this repository's specs (`API_BIN=... pnpm exec vitest run test/`, see README.md). A change to behaviour, an error message or a route here must be repeated there.
 - Run `pnpm verify` before committing; the API tests need Postgres, Redis, RabbitMQ, MongoDB and Meilisearch (`docker compose up -d ...`).
 
 ## After every task
