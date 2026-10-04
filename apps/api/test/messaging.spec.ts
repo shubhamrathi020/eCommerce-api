@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { RabbitService } from '../src/app/messaging/rabbit.service';
 import { SchedulerService } from '../src/app/messaging/scheduler.service';
-import { type TestApp, createTestApp, resetDatabase } from './test-app';
+import { type TestApp, createTestApp, itInProcess, resetDatabase } from './test-app';
 
 const ACCESS_SECRET = 'test-access-secret-that-is-at-least-32-chars';
 const adminToken = (permissions: string[]) => jwt.sign({ sub: 'admin-1', roles: ['admin'], permissions }, ACCESS_SECRET, { audience: 'ecom-api', issuer: 'ecom-api', expiresIn: '5m' });
@@ -111,7 +111,8 @@ describe('messaging: outbox relay, notification consumer, dead letters (BRD 23)'
     expect(emptyReplay.body).toEqual({ replayed: false });
   });
 
-  it('reminds a signed-in customer about an abandoned cart, once, and stays quiet for a fresh one', async () => {
+  // Calls the Nest scheduler's job function directly, so it only runs against the in-process app.
+  itInProcess('reminds a signed-in customer about an abandoned cart, once, and stays quiet for a fresh one', async () => {
     const signedUp = await t.http().post('/auth/register').send({ name: 'Rina Shah', email: 'rina@example.com', password: 'Str0ngPass' });
     const token = signedUp.body.accessToken as string;
     const userId = signedUp.body.session.user.id as string;
