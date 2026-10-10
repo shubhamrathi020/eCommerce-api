@@ -67,6 +67,7 @@ async function createRemoteApp(bin: string, overrides: Partial<ApiConfig>): Prom
     RAZORPAY_KEY_ID: '',
     RAZORPAY_KEY_SECRET: '',
     RAZORPAY_WEBHOOK_SECRET: '',
+    ...(overrides.razorpayWebhookSecret ? { RAZORPAY_WEBHOOK_SECRET: overrides.razorpayWebhookSecret } : {}),
     ...(overrides.rateLimit ? { RATE_LIMIT: 'on' } : {}),
   };
   const child = spawn(bin, REMOTE_ARGS, { env, stdio: ['ignore', 'pipe', 'pipe'] });

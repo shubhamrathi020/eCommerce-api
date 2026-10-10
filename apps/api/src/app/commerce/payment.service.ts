@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { CartTotals, Order, OrderNote, PaymentResult, PaymentSession, ShippingMethodId, TimelineEntry } from '@ecom/contracts';
+import type { Order as OrderRow } from '../../../generated/prisma';
 import { API_CONFIG, type ApiConfig } from '../config';
 import { AppError } from '../common/app-error';
 import { PrismaService } from '../prisma/prisma.service';
@@ -55,16 +56,49 @@ export class PaymentService {
     if (row.status !== 'pending_payment') throw new AppError('validation', 'This order can no longer be paid.');
     const valid = result.providerOrderId === row.providerOrderId && this.razorpay.verifyPaymentSignature(result.providerOrderId, result.providerPaymentId, result.signature);
     if (!valid) throw new AppError('validation', 'Payment verification failed. If money was deducted it will be refunded.');
+    const contract = await this.markPaid(row, result.providerPaymentId);
+    await this.cart.replaceWithEmpty(ownerKeyFor(owner.userId, owner.guestToken ?? ''), row.shippingMethod as ShippingMethodId);
+    return contract;
+  }
+
+  /**
+   * Razorpay's webhook: the safety net for a payment the browser never reported (closed tab, lost connection, a UPI request
+   * approved later). Only a captured payment changes anything. Razorpay sends `payment.failed` for every failed attempt, also
+   * while its window is still open and the shopper tries another method, so a failure here must not give the stock back (the
+   * browser reports a real give-up through `fail`, and the payment-deadline sweep releases an abandoned order).
+   */
+  async applyWebhook(event: string, providerOrderId: string, providerPaymentId: string): Promise<void> {
+    if (event !== 'payment.captured') return;
+    const row = await this.db.order.findFirst({ where: { providerOrderId } });
+    if (!row || row.paymentStatus === 'paid' || row.status !== 'pending_payment') return;
+    let shortfall: OrderNote | undefined;
+    if (row.paymentStatus === 'failed') {
+      // The browser reported a failure, which released the stock hold, before this payment was captured: take it again.
+      try {
+        await this.inventory.take(stockLinesOf(row));
+      } catch {
+        // The money is taken, so the order is confirmed anyway; staff see why it may not be shippable.
+        shortfall = systemNote('Paid after its stock hold was released, and the items could not be reserved again. Check stock before shipping, or cancel and refund.');
+      }
+    }
+    await this.markPaid(row, providerPaymentId, shortfall);
+  }
+
+  /** Marks an order paid and confirmed once, however many times the browser and the webhook report the same payment. */
+  private async markPaid(row: OrderRow, providerPaymentId: string, note?: OrderNote): Promise<Order> {
     const now = new Date().toISOString();
     const timeline: TimelineEntry[] = [...fromJson<TimelineEntry[]>(row.timeline), { status: 'paid', label: 'Payment received', at: now }, { status: 'confirmed', label: 'Order confirmed', at: now }];
-    const updated = await this.db.$transaction(async (tx) => {
-      const updatedRow = await tx.order.update({ where: { id: orderId }, data: { status: 'confirmed', paymentStatus: 'paid', providerPaymentId: result.providerPaymentId, timeline: toJson(timeline) } });
-      await this.outbox.write(tx, 'payment.confirmed', { orderId, email: row.contactEmail, name: row.contactName, amount: fromJson<CartTotals>(row.totals).total });
-      return updatedRow;
+    const notes = note ? [note, ...fromJson<OrderNote[]>(row.notes)] : undefined;
+    const { changed, updated } = await this.db.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id: row.id, paymentStatus: { not: 'paid' } },
+        data: { status: 'confirmed', paymentStatus: 'paid', providerPaymentId, timeline: toJson(timeline), ...(notes ? { notes: toJson(notes) } : {}) },
+      });
+      if (count === 1) await this.outbox.write(tx, 'payment.confirmed', { orderId: row.id, email: row.contactEmail, name: row.contactName, amount: fromJson<CartTotals>(row.totals).total });
+      return { changed: count === 1, updated: await tx.order.findUniqueOrThrow({ where: { id: row.id } }) };
     });
-    await this.cart.replaceWithEmpty(ownerKeyFor(owner.userId, owner.guestToken ?? ''), row.shippingMethod as ShippingMethodId);
     const contract = this.orders.toContract(updated);
-    await this.orderEvents.publish(contract);
+    if (changed) await this.orderEvents.publish(contract);
     return contract;
   }
 
@@ -73,8 +107,12 @@ export class PaymentService {
     if (row.paymentStatus === 'paid') return this.orders.toContract(row);
     // A failed payment gives its stock back; a retry (via initiate) claims it again.
     await this.inventory.giveBack(stockLinesOf(row));
-    const note: OrderNote = { id: `note_${Date.now().toString(36)}${randomBytes(2).toString('hex')}`, at: new Date().toISOString(), author: 'system', text: `Payment attempt failed: ${reason}` };
+    const note = systemNote(`Payment attempt failed: ${reason}`);
     const updated = await this.db.order.update({ where: { id: orderId }, data: { paymentStatus: 'failed', notes: toJson([note, ...fromJson<OrderNote[]>(row.notes)]) } });
     return this.orders.toContract(updated);
   }
+}
+
+function systemNote(text: string): OrderNote {
+  return { id: `note_${Date.now().toString(36)}${randomBytes(2).toString('hex')}`, at: new Date().toISOString(), author: 'system', text };
 }

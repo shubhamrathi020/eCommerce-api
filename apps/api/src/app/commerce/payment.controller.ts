@@ -4,11 +4,7 @@ import type { Order, PaymentResult, PaymentSession } from '@ecom/contracts';
 import { IsString } from 'class-validator';
 import type { Request } from 'express';
 import { CsrfGuard, OptionalAuthGuard, OptionalUser, type AuthUser } from '../common/auth';
-import { PrismaService } from '../prisma/prisma.service';
 import { readGuestCartToken } from './guest-cart-cookie';
-import { InventoryService } from './inventory.service';
-import { fromJson, toJson } from './json';
-import { stockLinesOf } from './order.service';
 import { PaymentService } from './payment.service';
 import { RazorpayService } from './razorpay.service';
 
@@ -31,9 +27,7 @@ export class PaymentController {
 
   constructor(
     private readonly payments: PaymentService,
-    private readonly inventory: InventoryService,
     private readonly razorpay: RazorpayService,
-    private readonly db: PrismaService,
   ) {}
 
   @Post('orders/:id/payment/initiate')
@@ -69,20 +63,7 @@ export class PaymentController {
     }
     const event = JSON.parse(req.rawBody) as { event?: string; payload?: { payment?: { entity?: { id?: string; order_id?: string } } } };
     const payment = event.payload?.payment?.entity;
-    if (!payment?.order_id) return { ok: true };
-    const order = await this.db.order.findFirst({ where: { providerOrderId: payment.order_id } });
-    if (!order) return { ok: true };
-
-    if (event.event === 'payment.captured' && order.paymentStatus !== 'paid' && order.status === 'pending_payment') {
-      const now = new Date().toISOString();
-      const timeline = [...fromJson<{ status: string; label: string; at?: string }[]>(order.timeline), { status: 'paid', label: 'Payment received', at: now }, { status: 'confirmed', label: 'Order confirmed', at: now }];
-      await this.db.order.update({ where: { id: order.id }, data: { status: 'confirmed', paymentStatus: 'paid', providerPaymentId: payment.id ?? null, timeline: toJson(timeline) } });
-      this.logger.log(`Webhook confirmed payment for order ${order.id}`);
-    } else if (event.event === 'payment.failed' && order.paymentStatus === 'pending') {
-      await this.inventory.giveBack(stockLinesOf(order));
-      await this.db.order.update({ where: { id: order.id }, data: { paymentStatus: 'failed' } });
-      this.logger.log(`Webhook recorded a failed payment for order ${order.id}`);
-    }
+    if (event.event && payment?.order_id && payment.id) await this.payments.applyWebhook(event.event, payment.order_id, payment.id);
     return { ok: true };
   }
 }
