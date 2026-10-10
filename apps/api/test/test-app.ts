@@ -62,6 +62,11 @@ async function createRemoteApp(bin: string, overrides: Partial<ApiConfig>): Prom
     JWT_ACCESS_SECRET: 'test-access-secret-that-is-at-least-32-chars',
     JWT_REFRESH_SECRET: 'test-refresh-secret-that-is-at-least-32-char',
     CORS_ORIGINS: ORIGIN,
+    // Like the in-process app, which never sees them: real test keys in apps/api/.env (loaded into the task by nx)
+    // must not reach the specs, which expect online payment to be unconfigured.
+    RAZORPAY_KEY_ID: '',
+    RAZORPAY_KEY_SECRET: '',
+    RAZORPAY_WEBHOOK_SECRET: '',
     ...(overrides.rateLimit ? { RATE_LIMIT: 'on' } : {}),
   };
   const child = spawn(bin, REMOTE_ARGS, { env, stdio: ['ignore', 'pipe', 'pipe'] });
